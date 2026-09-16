@@ -28,9 +28,11 @@ comparison = operand , comparison_op , operand;
 
 comparison_op = "=" | "!=" | "<" | "<=" | ">" | ">=";
 
-operand = string | number | bare_string;
+operand = string | number | qual_name |bare_string;
 
 bare_string = letter , { letter | number };
+
+qual_name = bare_string ,".", bare_string
 
 symbols = "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | "<" | "=" | ">" | "?" | "@" | "[" | "]" | "^" | "_" | "`" | "{" | "|" | "}" | "~";
 
