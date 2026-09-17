@@ -1,0 +1,1 @@
+Emp join[Emp.DID=Dept.DID] Dept

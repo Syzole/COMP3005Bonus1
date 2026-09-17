@@ -1,0 +1,4 @@
+result (Emp.EID, Emp.Name, Emp.DID, Dept.DID, Dept.DName) = {
+    E1, John, D1, D1, Sales
+    E2, Alice, D2, D2, HR
+}

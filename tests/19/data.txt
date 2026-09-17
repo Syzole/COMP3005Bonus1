@@ -1,0 +1,10 @@
+Emp (EID, Name, DID) = {
+    E1, John, D1
+    E2, Alice, D2
+    E3, Bob, D9
+}
+Dept (DID, DName) = {
+    D1, Sales
+    D2, HR
+    D3, Ops
+}

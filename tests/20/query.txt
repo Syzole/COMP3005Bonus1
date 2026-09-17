@@ -1,0 +1,1 @@
+rename[E2](Emp) join[Emp.MgrID=E2.EID] Emp

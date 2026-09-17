@@ -1,0 +1,5 @@
+result (E2.EID, E2.Name, E2.MgrID, Emp.EID, Emp.Name, Emp.MgrID) = {
+    E1, Pat, E1, E1, Pat, E1
+    E1, Pat, E1, E2, John, E1
+    E2, John, E1, E3, Alice, E2
+}
