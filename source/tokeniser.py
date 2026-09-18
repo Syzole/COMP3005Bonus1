@@ -40,6 +40,7 @@ def tokenise(source: str) -> list[Token]:
             return None
         return source[i]
     
+    #next is a function that returns the next character and updates the line and column
     def next() -> str:
         nonlocal i, line, column
         char = source[i]
@@ -52,7 +53,94 @@ def tokenise(source: str) -> list[Token]:
         return char
 
     while i < len(source):
-        start_line, start_column = line, column
+        start_line = line
+        start_column = column
         char = next()
+
         #now we start handling the different token types
+        
+        
+        #first handle whitespace by doing nothing
+        if char.isspace():
+            continue
+
+        if char in "\t\n\r":
+            next()
+            continue
+
+        #this would be an identifier, a letter then either more letters, digits, or underscores
+        if char.isalpha():
+            text = char
+            while (p := peek()) is not None and p.isalnum():
+                text += next()
+            tokens.append(Token(TokenType.IDENTIFIER, text, start_line, start_column))
+            continue
+
+        #handle the negative sign
+        if char == "-" and (p := peek()) is not None and p.isdigit():
+            text = char + next() #consume the '-' and attach the next digit to it
+            while (p := peek()) is not None and p.isdigit():
+                text += next()
+            tokens.append(Token(TokenType.NUMBER, text, start_line, start_column))
+            continue
+
+        #next hanlde if it is a number
+        if char.isdigit():
+            text = char
+            while (p := peek()) is not None and p.isdigit():
+                text += next()
+            tokens.append(Token(TokenType.NUMBER, text, start_line, start_column))
+            continue
+
+        #im very confident that the 2 if statments will not work for all cases, so i will adjust as needed
+
+        #first draft of handling the funny parts like [](), im confident that this will work for all cases
+        match (char, peek()):
+            # 2-character operators (checks peek() without advancing i unless matched)
+            case ("!", "="):
+                next() # consume the '='
+                tokens.append(Token(TokenType.NOT_EQUALS, None, start_line, start_column))
+            case ("<", "="):
+                next()
+                tokens.append(Token(TokenType.LESS_THAN_OR_EQUALS, None, start_line, start_column))
+            case (">", "="):
+                next()
+                tokens.append(Token(TokenType.GREATER_THAN_OR_EQUALS, None, start_line, start_column))
+
+            # 1-character operators / structural symbols
+            case ("[", _):
+                tokens.append(Token(TokenType.LBRACKET, None, start_line, start_column))
+            case ("]", _):
+                tokens.append(Token(TokenType.RBRACKET, None, start_line, start_column))
+            case ("(", _):
+                tokens.append(Token(TokenType.LPARENTHESIS, None, start_line, start_column))
+            case (")", _):
+                tokens.append(Token(TokenType.RPARENTHESIS, None, start_line, start_column))
+            case ("=", _):
+                tokens.append(Token(TokenType.EQUALS, None, start_line, start_column))
+            case ("<", _):
+                tokens.append(Token(TokenType.LESS_THAN, None, start_line, start_column))
+            case (">", _):
+                tokens.append(Token(TokenType.GREATER_THAN, None, start_line, start_column))
+            case (",", _):
+                tokens.append(Token(TokenType.COMMA, None, start_line, start_column))
+            case (".", _):
+                tokens.append(Token(TokenType.DOT, None, start_line, start_column))
+
+
+
+    
+    tokens.append(Token(TokenType.EOF, None, line, column))
+    return tokens
+
+
+if __name__ == "__main__":
+    test = "select[Age>=30](R)"
+    for t in tokenise(test):
+        print(f"{t.type}: {t.value} at {t.line}:{t.column}")
+
+    print("--------------------------------")
+    test = "select[Age>-30](R)"
+    for t in tokenise(test):
+        print(f"{t.type}: {t.value} at {t.line}:{t.column}")
 
