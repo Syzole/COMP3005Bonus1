@@ -6,3 +6,5 @@ Did finish the EBNF (after alot of deliberation and tested on a few traces from 
 
 I tried to get Ai to review it, it ended up making a left-recursive suggestion I found after a few minutes of testing the suggestions it gave me.
 I also wrote some tests from the assignment specs, will most likley make some more of my own tommarow, which I will use the help of AI to review and improve.
+
+Sept 17th - I started to work on the tokeniser, I have a feeling this will take a while. I plan to use the datatypes to save me some boiler plate code. I also asked the prof about what to do about "\n".

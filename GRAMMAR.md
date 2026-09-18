@@ -34,7 +34,7 @@ bare_string = letter , { letter | number };
 
 qual_name = bare_string ,".", bare_string
 
-symbols = "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | "<" | "=" | ">" | "?" | "@" | "[" | "]" | "^" | "_" | "`" | "{" | "|" | "}" | "~";
+symbols = "!" | "#" | "$" | "%" | "&";
 
 quoted_content = letter | number | " " | "''" | symbols;
 
@@ -44,12 +44,11 @@ relation_definition = relation_name , "(" , attribute_list , ")" , "=" , "{" { t
 
 tuple_line = operand , { "," , operand };
 
-letter = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
-  "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z";
+letter = "A"|"B"|..."Z"|"a"|"b"...|"z";
 
 number = ["-"], digit , {digit};
 
-digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+digit = "0"|"1"...|"9";
 
 # 5.2:
 - Precendence: By default I want to keep precedence as all equal
