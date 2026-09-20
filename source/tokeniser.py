@@ -52,6 +52,9 @@ def tokenise(source: str) -> list[Token]:
             column += 1
         return char
 
+    #here is where we will start the breakign down of the query
+    # and we will start to break them down into tokens
+
     while i < len(source):
         start_line = line
         start_column = column
@@ -68,6 +71,29 @@ def tokenise(source: str) -> list[Token]:
             next()
             continue
 
+        #now if we deal with strings
+        # i had the idea of using booleans to check if the string is escaped or not
+        # but i decided to use a while loop instead, cause it seemed easier
+        if char == "'":
+            text = char
+            while True:
+                p = peek()
+                if p is None:
+                    raise LexError(f"Unterminated string at {start_line}:{start_column}")
+
+
+                #handle the escape here 
+                if p == "'":
+                    text += next()
+                    if peek() == "'":
+                        text += next()
+                        continue
+                    break
+                text += next()
+            tokens.append(Token(TokenType.STRING, text, start_line, start_column))
+            continue
+
+
         #this would be an identifier, a letter then either more letters, digits, or underscores
         if char.isalpha():
             text = char
@@ -75,6 +101,7 @@ def tokenise(source: str) -> list[Token]:
                 text += next()
             tokens.append(Token(TokenType.IDENTIFIER, text, start_line, start_column))
             continue
+
 
         #handle the negative sign
         if char == "-" and (p := peek()) is not None and p.isdigit():
@@ -134,13 +161,26 @@ def tokenise(source: str) -> list[Token]:
     return tokens
 
 
+def dump_tokens(tokens: list[Token]) -> None:
+    for t in tokens:
+        pos = f"{t.line}:{t.column}"
+        kind = t.type.name
+        value = "" if t.value is None else repr(t.value)
+        print(f"  {pos:<7} {kind:<24} {value}")
+
+
 if __name__ == "__main__":
-    test = "select[Age>=30](R)"
-    for t in tokenise(test):
-        print(f"{t.type}: {t.value} at {t.line}:{t.column}")
+    from pathlib import Path
 
-    print("--------------------------------")
-    test = "select[Age>-30](R)"
-    for t in tokenise(test):
-        print(f"{t.type}: {t.value} at {t.line}:{t.column}")
+    tests = Path(__file__).resolve().parent.parent / "tests"
+    first, last = 12, 12  # change this range as you go
 
+    for n in range(first, last + 1):
+        query = (tests / str(n) / "query.txt").read_text(encoding="utf-8")
+        print(f"=== test {n} ===")
+        print(f"query: {query.rstrip()}")
+        try:
+            dump_tokens(tokenise(query))
+        except LexError as e:
+            print(f"  ERROR: {e}")
+        print()

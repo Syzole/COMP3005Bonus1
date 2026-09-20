@@ -8,3 +8,6 @@ I tried to get Ai to review it, it ended up making a left-recursive suggestion I
 I also wrote some tests from the assignment specs, will most likley make some more of my own tommarow, which I will use the help of AI to review and improve.
 
 Sept 17th - I started to work on the tokeniser, I have a feeling this will take a while. I plan to use the datatypes to save me some boiler plate code. I also asked the prof about what to do about "\n".
+Sept 18th - Tokeniser is working so far, will test further to ensure it works for all cases. Will also begin to start working on AST as well, since the tokeniser is working pretty well so far. AI had made some solid suggestions this time, so I plan to use the suggestions such as how to handle the strings.
+
+Sept 19th - Using what I used for the tokeniser, I started to work on the AST. I also learned that I can treat the "\n" as whitespace. So far solid progress has been made, will continue to work on it tommarow (since it is 3am right now)
