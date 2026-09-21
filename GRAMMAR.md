@@ -56,8 +56,28 @@ Precedence Table:
 ------------------------------------------------------------------------------
 Level            Operator(s)                          Associativity   Notes
 ------------------------------------------------------------------------------
-1(Highest)       select,project,rename                n/a             associativity does not apply to them since they can only take one input at a time
+1                select,project,rename                n/a             associativity does not apply 
 ------------------------------------------------------------------------------
 2                Union,intersect,minus,times,join     Left-to-right   
 
 - Associativity: This I wanted to keep left-to-right as it is more intuitive and consistent with the way we read and write expressions.
+
+
+
+
+# 5.3:
+
+
+# 5.4:
+My parsing strategy is to first tokenize the input, then parse the tokens into the AST nodes.
+For more detial about my parsing strategy, I used recursive descent parsing, which is a top-down parsing technique that works by calling a function for each non-terminal in the grammar. I chose this because it is a simple and easy to understand parsing technique that is well suited for the grammar once it is proven to be a LL(1) grammar, which mine is since we dont need to look ahead more than one token to parse the input.
+
+Left recursion is a problem that can occur when using recursive descent parsing. An example of left recursion is the following:
+expression = expression , "+" , term;
+
+Where since the expression is defined as itself plus a term, it will call the expression function again, causing an infinite loop.
+
+To solve this I aimed to use repition operators to avoid left recursion. An example of this is the following:
+expression = term , { "+" , term };
+
+where if I wanted more than one term, I could just add more terms to the list, thus avoiding left recursion and allowing for more than one term.

@@ -47,6 +47,19 @@ class Parser:
         self.expect(TokenType.EOF)
         return node
 
+    #here is where we will define unary expressions
+    def project_expr(self):
+        self.next() #consume project
+        self.expect(TokenType.LBRACKET)
+        attributes = [self.expect(TokenType.IDENTIFIER).value]
+        while self.check(TokenType.COMMA): #while there are still commas that means we still got atts to look at
+            self.next()
+            attributes.append(self.expect(TokenType.IDENTIFIER).value)
+        self.expect(TokenType.RBRACKET) #close out the project
+        self.expect(TokenType.LPARENTHESIS)#state the relation
+        inside = self.expression()
+        self.expect(TokenType.RPARENTHESIS)
+        return Project(attrs=attributes, input=inside)
 
     def select_expr(self):
         self.next() #consume the select token
@@ -57,6 +70,17 @@ class Parser:
         inner = self.expression()
         self.expect(TokenType.RPARENTHESIS)
         return Select(cond=condition, input=inner)
+
+    def rename_expr(self):
+        self.next() #consume rename
+        self.expect(TokenType.LBRACKET)
+        name = self.expect(TokenType.IDENTIFIER).value
+        self.expect(TokenType.RBRACKET)
+        self.expect(TokenType.LPARENTHESIS)
+        inner = self.expression()
+        self.expect(TokenType.RPARENTHESIS)
+        return Rename(name=name, input=inner)
+
 
 
     def term(self):
@@ -74,9 +98,6 @@ class Parser:
         if self.check(TokenType.IDENTIFIER):
             return Relation(name=self.next().value)
         raise ParseError(f"Unexpected token: {self.peek().type}")
-
-
-    
 
     def comparison(self):
         left = self.operand()
@@ -100,3 +121,6 @@ class Parser:
 
 if __name__ == "__main__":
     print(Parser(tokenise("select[Age>30](Employees)")).parse())
+    print(Parser(tokenise("project[Name](select[Age>30](Employees))")).parse())
+    q = "project[Name](select[Age>30](Employees))"
+    print(format_tree(Parser(tokenise(q)).parse()))
