@@ -18,6 +18,8 @@ class TokenType(Enum):
     GREATER_THAN = auto() # >
     GREATER_THAN_OR_EQUALS = auto() # >=
     EOF = auto() # End of file
+    LBRACE = auto() # {
+    RBRACE = auto() # }
 
 @dataclass
 class Token:
@@ -153,6 +155,10 @@ def tokenise(source: str) -> list[Token]:
                 tokens.append(Token(TokenType.COMMA, None, start_line, start_column))
             case (".", _):
                 tokens.append(Token(TokenType.DOT, None, start_line, start_column))
+            case ("{", _):
+                tokens.append(Token(TokenType.LBRACE, None, start_line, start_column))
+            case ("}", _):
+                tokens.append(Token(TokenType.RBRACE, None, start_line, start_column))
 
 
 
@@ -169,6 +175,9 @@ def dump_tokens(tokens: list[Token]) -> None:
         print(f"  {pos:<7} {kind:<24} {value}")
 
 
+
+
+#this is me running some small tests on the tokeniser, making sure it splits as expected
 if __name__ == "__main__":
     from pathlib import Path
 

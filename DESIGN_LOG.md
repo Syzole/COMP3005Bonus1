@@ -13,3 +13,5 @@ Sept 18th - Tokeniser is working so far, will test further to ensure it works fo
 Sept 19th - Using what I used for the tokeniser, I started to work on the AST. I also learned that I can treat the "\n" as whitespace. So far solid progress has been made, will continue to work on it tommarow (since it is 3am right now)
 
 Sept 20th & 21st - AST is working pretty well, will continue to work on it, it seems to be working for the examples given in the document. Parser is also working well, will continue to work on it. I tried to use AI, but it had left certain parts out of the EBNF document so I had to write them myself. 
+
+Sept 21st - Parser is working better, added more stuff liek and + or + not, plus condition to work with comparisiosn, now I need to see if it covers all the cases, then will move to evaluation.
