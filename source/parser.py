@@ -67,7 +67,7 @@ class Parser:
         self.next() #consume project
         self.expect(TokenType.LBRACKET)
 
-        if self.check(TokenType.RBRACKET):
+        if self.check(TokenType.RBRACKET): #if they immediately close the bracket, its empty D:
             raise ParseError("Empty attr list")
 
         attributes = [self.expect(TokenType.IDENTIFIER).value]

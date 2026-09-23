@@ -15,3 +15,5 @@ Sept 19th - Using what I used for the tokeniser, I started to work on the AST. I
 Sept 20th & 21st - AST is working pretty well, will continue to work on it, it seems to be working for the examples given in the document. Parser is also working well, will continue to work on it. I tried to use AI, but it had left certain parts out of the EBNF document so I had to write them myself. 
 
 Sept 21st - Parser is working better, added more stuff liek and + or + not, plus condition to work with comparisiosn, now I need to see if it covers all the cases, then will move to evaluation.
+
+Sept 22nd- Evaluation and table loading has started, will continue to work down the cases over the next few days, and wrap up the project by the end of the week (hopefully)

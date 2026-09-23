@@ -31,10 +31,18 @@ def _read(path: Path) -> Source:
     return Source(path=str(path), text=text)
 
 
-TEST_NUMBER = 2
+TEST_NUMBER = 1,25
 
-case = load_test(TEST_NUMBER)
-print(f"test {case.number}")
-print(case.data.text, end="" if case.data.text.endswith("\n") else "\n")
-print(case.query.text, end="" if case.query.text.endswith("\n") else "\n")
-print(format_tree(Parser(tokenise(case.query.text)).parse()))
+for test_number in range(TEST_NUMBER[0], TEST_NUMBER[1] + 1):
+    try:
+        case = load_test(test_number)
+        print(f"test {case.number}")
+    except Exception as e:
+        print(f"test {test_number} failed: {e}")
+        continue
+    try:
+        print(case.data.text, end="" if case.data.text.endswith("\n") else "\n")
+        print(case.query.text, end="" if case.query.text.endswith("\n") else "\n")
+        print(format_tree(Parser(tokenise(case.query.text)).parse()))
+    except Exception as e:
+        print(f"test {test_number} failed: {e}")
