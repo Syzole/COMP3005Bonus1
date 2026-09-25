@@ -17,3 +17,5 @@ Sept 20th & 21st - AST is working pretty well, will continue to work on it, it s
 Sept 21st - Parser is working better, added more stuff liek and + or + not, plus condition to work with comparisiosn, now I need to see if it covers all the cases, then will move to evaluation.
 
 Sept 22nd- Evaluation and table loading has started, will continue to work down the cases over the next few days, and wrap up the project by the end of the week (hopefully)
+
+Sept 24th - Evaluation seems to be working, all tests have passed, will double check that tests are correct and complete. Will also start to work on the report.

@@ -81,7 +81,7 @@ def tokenise(source: str) -> list[Token]:
             while True:
                 p = peek()
                 if p is None:
-                    raise LexError(f"Unterminated string at {start_line}:{start_column}")
+                    raise LexError("string never closed")
 
 
                 #handle the escape here 

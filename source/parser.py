@@ -68,7 +68,7 @@ class Parser:
         self.expect(TokenType.LBRACKET)
 
         if self.check(TokenType.RBRACKET): #if they immediately close the bracket, its empty D:
-            raise ParseError("Empty attr list")
+            raise ParseError("empty attribute list")
 
         attributes = [self.expect(TokenType.IDENTIFIER).value]
         while self.check(TokenType.COMMA): #while there are still commas that means we still got atts to look at
