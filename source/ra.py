@@ -5,6 +5,7 @@ from tree import format_tree
 from eval import format_result, evaluate
 from table import load_relation
 from pathlib import Path
+from eval import EvalError
 
 
 def main():
@@ -34,6 +35,9 @@ def main():
     except ParseError as e:
         print(f"Parse error: {e}")
         return
+    except EvalError as e:
+        print(f"error: {e}")
+        return
     
     if args.tree:
         print(format_tree(ast))
@@ -49,8 +53,12 @@ def main():
 
     #if we get this far, we can evaluate the query
     # print("args.query", args.query)
-    result = evaluate(ast, catalog)
-    print(format_result(result))
+    try:
+        result = evaluate(ast, catalog)
+        print(format_result(result))
+    except EvalError as e:
+        print(f"error: {e}")
+        return
 
 
 if __name__ == "__main__":

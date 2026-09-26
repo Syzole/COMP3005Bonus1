@@ -12,12 +12,14 @@ def normalize(text: str) -> str:
     return "".join(text.split())
 
 
-def run_case(n: int) -> str:
+def run_case(n: int, verbose: bool = False) -> str:
     """Return what the program should print for this test (result or error line)."""
     folder = ROOT / "tests" / str(n)
     data = (folder / "data.txt").read_text(encoding="utf-8")
     query = (folder / "query.txt").read_text(encoding="utf-8")
-
+    if verbose:
+        print("data", data)
+        print("query", query)
     try:
         catalog = load_relation(data)
         ast = Parser(tokenise(query)).parse()
@@ -32,7 +34,7 @@ def run_case(n: int) -> str:
 
 def test_one(n: int, verbose: bool = False) -> bool:
     answer = (ROOT / "tests" / str(n) / "result.txt").read_text(encoding="utf-8")
-    got = run_case(n)
+    got = run_case(n, verbose=verbose)
     ok = normalize(got) == normalize(answer)
 
     status = "PASS" if ok else "FAIL"
@@ -60,7 +62,7 @@ if __name__ == "__main__":
     verbose = "-v" in sys.argv[1:]
 
     if len(args) == 0:
-        start, end = 1, 25
+        start, end = 1, 29
     elif len(args) == 1:
         start = end = int(args[0])
     else:

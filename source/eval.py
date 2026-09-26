@@ -40,6 +40,8 @@ def normalize(v):
 
 def evaluate(node, catalog: dict[str, Table]) -> Table:
     if isinstance(node, Relation):
+        if node.name not in catalog:
+            raise EvalError(f"name, unknown relation {node.name}")
         return catalog[node.name]    
 
     if isinstance(node, Select):
@@ -58,6 +60,9 @@ def evaluate(node, catalog: dict[str, Table]) -> Table:
             seen.add(attr)
 
         child = evaluate(node.input, catalog)
+        for attr in node.attrs:
+            if attr not in child.attributes:
+                raise EvalError(f"name, unknown attribute {attr}")
         indexes = [child.attributes.index(a) for a in node.attrs]
         rows = []
         seen = set()
@@ -142,6 +147,8 @@ def value_of(operand, attrs, row):
         return s
     if isinstance(operand, Attr):
         key = f"{operand.relation}.{operand.name}" if operand.relation else operand.name
+        if key not in attrs:
+            raise EvalError(f"name, unknown attribute {key}")
         return row[attrs.index(key)]
 
     raise ValueError(f"not implemented: {type(operand)}")

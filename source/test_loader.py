@@ -41,7 +41,7 @@ for test_number in range(TEST_NUMBER[0], TEST_NUMBER[1] + 1):
         print(f"test {test_number} failed: {e}")
         continue
     try:
-        print(case.data.text, end="" if case.data.text.endswith("\n") else "\n")
+        # print(case.data.text, end="" if case.data.text.endswith("\n") else "\n")
         print(case.query.text, end="" if case.query.text.endswith("\n") else "\n")
         print(format_tree(Parser(tokenise(case.query.text)).parse()))
     except Exception as e:

@@ -134,9 +134,19 @@ def label_and_children(node) -> tuple[str, list[object]]:
 
     elif isinstance(node, Select):
         return "Select", [
-            (f"cond: {format_condition(node.cond)}", None),
+            ("cond", node.cond),   # recurse
             ("input", node.input),
         ]
+
+    
+    elif isinstance(node, Compare):
+        return f"{format_operand(node.left)} {node.op} {format_operand(node.right)}", []
+    elif isinstance(node, And):
+        return "And", [("left", node.left), ("right", node.right)]
+    elif isinstance(node, Or):
+        return "Or", [("left", node.left), ("right", node.right)]
+    elif isinstance(node, Not):
+        return "Not", [("cond", node.cond)]
 
     elif isinstance(node, Rename):
         return "Rename", [

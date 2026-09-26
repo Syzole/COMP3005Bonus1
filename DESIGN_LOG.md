@@ -19,3 +19,5 @@ Sept 21st - Parser is working better, added more stuff liek and + or + not, plus
 Sept 22nd- Evaluation and table loading has started, will continue to work down the cases over the next few days, and wrap up the project by the end of the week (hopefully)
 
 Sept 24th - Evaluation seems to be working, all tests have passed, will double check that tests are correct and complete. Will also start to work on the report.
+
+Sept 26th - Added more tests, and added more error handling. Will continue to work on the project, and wrap up the report. added more tests, adjuted errors and updated tree display so it is more accurate
