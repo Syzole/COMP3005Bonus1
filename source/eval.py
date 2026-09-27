@@ -1,26 +1,36 @@
 from table import Table
 from tree import *
 
+"""
+Evaluate an RA AST against a catalog of Tables. (RA is Relational Algebra)
+Pipeline: AST node -> recursively evaluate children -> return a Table.
+Handles select/project/rename, set ops, product, and join (with column qualification).
+"""
+
 class EvalError(Exception):
     pass
 
 def as_set(table: Table) -> set[tuple]:
+    """Convert a Table to a set of tuples for set operations (union, intersect, minus, etc.)."""
     result = set()
     for row in table.rows:
         result.add(tuple(row))
     return result
 
 def from_set(attrs: list[str], rows: set[tuple]) -> Table:
+    """Convert a set of tuples to a Table."""
     result = []
     for row in rows:
         result.append(list(row))
     return Table(attributes=attrs, rows=result)
 
 def same_schema(a: Table, b: Table) -> bool:
+    """Check if two Tables have the same schema."""
     return a.attributes == b.attributes
 
 def relation_label(node) -> str | None:
     """Name used to qualify columns for a join side."""
+    # the reason only relation and rename are qualified is because they are the only nodes that can have a relation name
     if isinstance(node, Relation):
         return node.name
     if isinstance(node, Rename):
@@ -28,17 +38,20 @@ def relation_label(node) -> str | None:
     return None  # already qualified / nested
 
 def qualify(table: Table, name: str | None) -> Table:
+    """Qualify the columns of a Table with a relation name."""
     if name is None:
         return table
-    attrs = [f"{name}.{a.split('.')[-1]}" for a in table.attributes]
+    attrs = [f"{name}.{a.split('.')[-1]}" for a in table.attributes] # strips old rel.attr before re-prefixing
     return Table(attributes=attrs, rows=[list(r) for r in table.rows])
 
 def normalize(v):
+    """Normalize a value (remove quotes from strings)."""
     if isinstance(v, str) and len(v) >= 2 and v[0] == "'" and v[-1] == "'":
         return v[1:-1].replace("''", "'")
     return v
 
 def evaluate(node, catalog: dict[str, Table]) -> Table:
+    """Recursively evaluate AST; catalog maps relation name -> Table."""
     if isinstance(node, Relation):
         if node.name not in catalog:
             raise EvalError(f"name, unknown relation {node.name}")
@@ -53,7 +66,7 @@ def evaluate(node, catalog: dict[str, Table]) -> Table:
         return Table(attributes=child.attributes, rows=kept)
 
     if isinstance(node, Project):
-        seen = set()
+        seen = set() # check for duplicate attributes in the project list
         for attr in node.attrs:
             if attr in seen:
                 raise EvalError(f"schema, duplicate attribute {attr}")
@@ -63,9 +76,10 @@ def evaluate(node, catalog: dict[str, Table]) -> Table:
         for attr in node.attrs:
             if attr not in child.attributes:
                 raise EvalError(f"name, unknown attribute {attr}")
+
         indexes = [child.attributes.index(a) for a in node.attrs]
         rows = []
-        seen = set()
+        seen = set() # check for duplicate rows in the projected table
         for row in child.rows:
             projected = [row[i] for i in indexes]
             key = tuple(projected)
@@ -91,6 +105,7 @@ def evaluate(node, catalog: dict[str, Table]) -> Table:
     raise ValueError(f"not implemented: {type(node)}")
 
 def eval_binary(op, left, right, cond):
+    """Run union/intersect/minus (same schema), times, or join with cond"""
     if op in ("union", "intersect", "minus"):
         if left.attributes != right.attributes:
             raise EvalError("schema, not union compatible")
@@ -124,6 +139,7 @@ def eval_binary(op, left, right, cond):
 
 
 def matches(cond, attrs: list[str], row: list) -> bool:
+    """True if row satisfies condition AST (Compare/And/Or/Not)."""
     if isinstance(cond, Compare):
         left = value_of(cond.left, attrs, row)
         right = value_of(cond.right, attrs, row)
@@ -145,8 +161,8 @@ def value_of(operand, attrs, row):
         if len(s) >= 2 and s[0] == "'" and s[-1] == "'": #check if the string is wrapped in quotes
             s = s[1:-1].replace("''", "'") #replace double quotes with single quotes
         return s
-    if isinstance(operand, Attr):
-        key = f"{operand.relation}.{operand.name}" if operand.relation else operand.name
+    if isinstance(operand, Attr): 
+        key = f"{operand.relation}.{operand.name}" if operand.relation else operand.name # if the relation is not None, add the relation name to the attribute name
         if key not in attrs:
             raise EvalError(f"name, unknown attribute {key}")
         return row[attrs.index(key)]
@@ -154,10 +170,10 @@ def value_of(operand, attrs, row):
     raise ValueError(f"not implemented: {type(operand)}")
 
 def compare(left, op, right):
-    left = normalize(left)
+    left = normalize(left) #normalize to remove quotes from strings
     right = normalize(right)
     if op in ("<", "<=", ">", ">=") and type(left) is not type(right):
-        # int vs str after norm
+        # int vs str after norm (normalize to remove quotes from strings incase you missed the comment above)
         if isinstance(left, (int, float)) and isinstance(right, str) or \
            isinstance(right, (int, float)) and isinstance(left, str):
             raise EvalError("type, number compared to string")

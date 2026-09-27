@@ -2,13 +2,20 @@ from dataclasses import dataclass
 from tokeniser import tokenise, TokenType, Token
 from tree import *
 
+"""
+In-memory relation storage and data.txt loader.
+load_relation parses text like:
+  Employees(Name, Age) = { 'Alice', 30 ... }
+into dict[name] -> Table(attributes, rows).
+"""
+
 @dataclass
 class Table:
     attributes: list[str]
     rows: list[list]
 
 
-def load_relation(text: str) -> dict[str, Table]:
+def load_relation(text: str) -> dict[str, Table]: #it acts lile Name(attributes) = { row1, row2, ... }
     tokens = tokenise(text)
     i = 0
     tables = {}

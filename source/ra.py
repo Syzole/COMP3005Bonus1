@@ -7,7 +7,9 @@ from table import load_relation
 from pathlib import Path
 from eval import EvalError
 
-
+"""
+Main function to run the RA query language by parsing the query, evaluating the AST against the catalog, and printing the result.
+"""
 def main():
     arg_parse = argparse.ArgumentParser(description="Query language for relational databases")
     arg_parse.add_argument(
@@ -19,7 +21,7 @@ def main():
         "query",
         help='query string, e.g. \'project[Name](select[Age>30](Employees))\'',
     )
-    arg_parse.add_argument(
+    arg_parse.add_argument( #falls back to the default if no data is provided
         "--data",
         help="path to a data.txt / relation file",
         default="tests/data/Employees.txt",
@@ -34,9 +36,6 @@ def main():
         return
     except ParseError as e:
         print(f"Parse error: {e}")
-        return
-    except EvalError as e:
-        print(f"error: {e}")
         return
     
     if args.tree:

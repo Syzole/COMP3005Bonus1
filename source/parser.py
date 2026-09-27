@@ -1,6 +1,12 @@
 from tokeniser import Token, TokenType, tokenise
 from tree import *
 
+"""
+Recursive-descent parser: tokens -> AST (tree.py nodes).
+Precedence (high to low for conditions): not > and > or.
+Binary RA ops (union/intersect/minus/times/join) are left-associative via expression().
+"""
+
 OPS = {
         TokenType.EQUALS: "=",
         TokenType.NOT_EQUALS: "!=",
@@ -25,7 +31,7 @@ class Parser:
         while self.check(TokenType.IDENTIFIER) and self.peek().value in BINARY_OPS:
             op = self.next().value
             cond = None
-            if op == "join":
+            if op == "join": #the reason we have a condition for join is because it is a binary operation and needs a condition unlike the other binary operations
                 self.expect(TokenType.LBRACKET)
                 cond = self.condition()
                 self.expect(TokenType.RBRACKET)
@@ -67,7 +73,7 @@ class Parser:
         self.next() #consume project
         self.expect(TokenType.LBRACKET)
 
-        if self.check(TokenType.RBRACKET): #if they immediately close the bracket, its empty D:
+        if self.check(TokenType.RBRACKET): #if they immediately close the bracket, its empty
             raise ParseError("empty attribute list")
 
         attributes = [self.expect(TokenType.IDENTIFIER).value]
@@ -129,9 +135,9 @@ class Parser:
 
 
     def operand(self):
-        if self.check(TokenType.IDENTIFIER):
+        if self.check(TokenType.IDENTIFIER): #if an identifier is the next token, consume it and return the attribute
             name = self.next().value
-            if self.check(TokenType.DOT):
+            if self.check(TokenType.DOT): #if a dot is the next token, consume it and return the attribute
                 self.next()
                 attr = self.expect(TokenType.IDENTIFIER).value
                 return Attr(name=attr, relation=name)
@@ -162,10 +168,10 @@ class Parser:
         return left
 
     def not_condition(self):
-        if self.check(TokenType.IDENTIFIER, "not"):
+        if self.check(TokenType.IDENTIFIER, "not"): #if not is the next token, consume it and return the not condition
             self.next()
             return Not(cond=self.not_condition())
-        if self.check(TokenType.LPARENTHESIS):
+        if self.check(TokenType.LPARENTHESIS): #if a parenthesis is the next token, consume it and return the condition
             self.next()
             node = self.condition()
             self.expect(TokenType.RPARENTHESIS)

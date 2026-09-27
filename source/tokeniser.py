@@ -105,7 +105,7 @@ def tokenise(source: str) -> list[Token]:
             continue
 
 
-        #handle the negative sign
+        #handle the negative sign for negative numbers
         if char == "-" and (p := peek()) is not None and p.isdigit():
             text = char + next() #consume the '-' and attach the next digit to it
             while (p := peek()) is not None and p.isdigit():
@@ -116,15 +116,12 @@ def tokenise(source: str) -> list[Token]:
         #next hanlde if it is a number
         if char.isdigit():
             text = char
-            while (p := peek()) is not None and p.isdigit():
+            while (p := peek()) is not None and p.isdigit(): #add more numbers to make it one number
                 text += next()
             tokens.append(Token(TokenType.NUMBER, text, start_line, start_column))
             continue
 
-        #im very confident that the 2 if statments will not work for all cases, so i will adjust as needed
-
-        #first draft of handling the funny parts like [](), im confident that this will work for all cases
-        match (char, peek()):
+        match (char, peek()): #this is the maximal munching approach, it will match the longest possible token
             # 2-character operators (checks peek() without advancing i unless matched)
             case ("!", "="):
                 next() # consume the '='

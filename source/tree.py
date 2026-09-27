@@ -156,7 +156,7 @@ def label_and_children(node) -> tuple[str, list[object]]:
         
     elif isinstance(node, Binary):
         children = []
-        if node.cond is not None:
+        if node.cond is not None: #the reason we have a condition for join is because it is a binary operation and needs a condition unlike the other binary operations
             children.append((f"cond: {format_condition(node.cond)}", None))
         children.append(("left", node.left))
         children.append(("right", node.right))
