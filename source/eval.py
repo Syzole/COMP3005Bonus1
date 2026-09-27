@@ -7,6 +7,14 @@ Pipeline: AST node -> recursively evaluate children -> return a Table.
 Handles select/project/rename, set ops, product, and join (with column qualification).
 """
 
+join_comparisons = 0
+select_comparisons = 0
+
+def reset_counters():
+    global join_comparisons, select_comparisons
+    join_comparisons = 0
+    select_comparisons = 0
+
 class EvalError(Exception):
     pass
 
@@ -51,6 +59,7 @@ def normalize(v):
     return v
 
 def evaluate(node, catalog: dict[str, Table]) -> Table:
+    global select_comparisons
     """Recursively evaluate AST; catalog maps relation name -> Table."""
     if isinstance(node, Relation):
         if node.name not in catalog:
@@ -61,6 +70,7 @@ def evaluate(node, catalog: dict[str, Table]) -> Table:
         child = evaluate(node.input, catalog)
         kept = []
         for row in child.rows:
+            select_comparisons += 1
             if matches(node.cond, child.attributes, row):
                 kept.append(row)
         return Table(attributes=child.attributes, rows=kept)
@@ -105,6 +115,7 @@ def evaluate(node, catalog: dict[str, Table]) -> Table:
     raise ValueError(f"not implemented: {type(node)}")
 
 def eval_binary(op, left, right, cond):
+    global join_comparisons
     """Run union/intersect/minus (same schema), times, or join with cond"""
     if op in ("union", "intersect", "minus"):
         if left.attributes != right.attributes:
@@ -129,6 +140,7 @@ def eval_binary(op, left, right, cond):
         rows = []
         for l in left.rows:
             for r in right.rows:
+                join_comparisons += 1
                 row = l + r
                 if matches(cond, attrs, row):
                     rows.append(row)
