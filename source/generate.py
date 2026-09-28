@@ -14,7 +14,7 @@ import argparse
 import random
 import sys
 from pathlib import Path
-
+import time
 
 def write_relation(name: str, attrs: list[str], rows: list[list], f) -> None:
     f.write(f"{name}({', '.join(attrs)}) = {{\n")
@@ -90,7 +90,10 @@ def run_experiment(match: int, seed: int | None, out_dir: Path) -> None:
     query = "R join[R.b=S.b] S"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"{'n':>8}  {'join comparisons':>20}  {'expected n*n':>20}")
+    print(
+        f"{'n':>8}  {'m':>4}  {'comparisons':>16}  "
+        f"{'wall time (s)':>14}  {'output tuples':>14}"
+    )
     for n in sizes:
         path = out_dir / f"r{n}.txt"
         r_rows, s_rows = generate_relations(n, n, match, seed=seed)
@@ -98,10 +101,16 @@ def run_experiment(match: int, seed: int | None, out_dir: Path) -> None:
 
         reset_counters()
         catalog = load_relation(path.read_text(encoding="utf-8"))
-        evaluate(Parser(tokenise(query)).parse(), catalog)
+        ast = Parser(tokenise(query)).parse()
+        
+        t0 = time.perf_counter()
+        result = evaluate(ast, catalog)
+        elapsed = time.perf_counter() - t0
+        print(
+            f"{n:>8}  {match:>4}  {join_comparisons:>16}  "
+            f"{elapsed:>14.4f}  {len(result.rows):>14}"
+        )
 
-        expected = n * n
-        print(f"{n:>8}  {join_comparisons:>20}  {expected:>20}")
 
 
 def main() -> None:
