@@ -66,6 +66,37 @@ Level            Operator(s)                          Associativity   Notes
 
 
 # 5.3:
+The two possible parse trees that could be given from the input of "A union B minus C" are:
+```
+          minus
+         /     \
+        union    C
+       /     \
+      A       B
+```
+```
+          union
+         /     \
+        A      minus
+              /     \
+             B       C
+```
+
+This gives us different results. For example if A = {1}, B = {2}, C = {1}
+Tree 1:
+{1} union {2} = {1,2}
+{1,2} minus {1} = {2}
+
+Tree 2:
+{2} minus {1} = {2}
+{1} union {2} = {1,2}
+
+To make it so that the first tree is forced, I can change the language to become:
+```
+Expr ::= Primary { ("union" | "minus") Primary }
+Primary ::= "(" Expr ")"| IDENT
+```
+This forces the first tree by making it so that the union and minus operators are left associative, which means that they will be evaluated from left to right. This is done by making the union and minus operators part of the same precedence level, and by making them left associative, we can ensure that the first tree is always chosen.
 
 
 # 5.4:

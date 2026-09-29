@@ -21,3 +21,5 @@ Sept 22nd- Evaluation and table loading has started, will continue to work down 
 Sept 24th - Evaluation seems to be working, all tests have passed, will double check that tests are correct and complete. Will also start to work on the report.
 
 Sept 26th - Added more tests, and added more error handling. Will continue to work on the project, and wrap up the report. added more tests, adjuted errors and updated tree display so it is more accurate
+
+sept 27-28th - Wrapped up the project, finsihed the report and finsiehd the grammer, will record tommarow and finish the project.

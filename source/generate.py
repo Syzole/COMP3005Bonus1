@@ -84,14 +84,14 @@ def run_experiment(match: int, seed: int | None, out_dir: Path) -> None:
     from tokeniser import tokenise
     from parser import Parser
     from table import load_relation
-    from eval import evaluate, reset_counters, join_comparisons
+    import eval as ev
 
     sizes = [1000, 2000, 4000, 8000, 16000, 32000, 64000]
     query = "R join[R.b=S.b] S"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     print(
-        f"{'n':>8}  {'m':>4}  {'comparisons':>16}  "
+        f"{'n':>8}  {'m':>8}  {'comparisons':>16}  "
         f"{'wall time (s)':>14}  {'output tuples':>14}"
     )
     for n in sizes:
@@ -99,19 +99,62 @@ def run_experiment(match: int, seed: int | None, out_dir: Path) -> None:
         r_rows, s_rows = generate_relations(n, n, match, seed=seed)
         write_file(path, r_rows, s_rows)
 
-        reset_counters()
+        ev.reset_counters()
         catalog = load_relation(path.read_text(encoding="utf-8"))
         ast = Parser(tokenise(query)).parse()
         
         t0 = time.perf_counter()
-        result = evaluate(ast, catalog)
+        result = ev.evaluate(ast, catalog)
         elapsed = time.perf_counter() - t0
         print(
-            f"{n:>8}  {match:>4}  {join_comparisons:>16}  "
+            f"{n:>8}  {n:>8}  {ev.join_comparisons:>16}  "
             f"{elapsed:>14.4f}  {len(result.rows):>14}"
         )
 
 
+def run_unary_experiment(out_dir: Path) -> None:
+    from tokeniser import tokenise
+    from parser import Parser
+    from table import load_relation
+    import eval as ev
+
+    sizes = [1000, 2000, 4000, 8000, 16000, 32000, 64000]
+
+    print("Select  (query: select[b>=0](R))")
+    print(
+        f"{'n':>8}  {'comparisons':>12}  "
+        f"{'wall time (s)':>14}  {'output tuples':>14}"
+    )
+    for n in sizes:
+        path = out_dir / f"r{n}.txt"
+        catalog = load_relation(path.read_text(encoding="utf-8"))
+
+        ev.reset_counters()
+        ast = Parser(tokenise("select[b>=0](R)")).parse()
+        t0 = time.perf_counter()
+        result = ev.evaluate(ast, catalog)
+        elapsed = time.perf_counter() - t0
+        print(
+            f"{n:>8}  {ev.select_comparisons:>12}  "
+            f"{elapsed:>14.4f}  {len(result.rows):>14}"
+        )
+
+    print()
+    print("Project (query: project[a](R))")
+    print(
+        f"{'n':>8}  {'wall time (s)':>14}  {'output tuples':>14}"
+    )
+    for n in sizes:
+        path = out_dir / f"r{n}.txt"
+        catalog = load_relation(path.read_text(encoding="utf-8"))
+
+        ast = Parser(tokenise("project[a](R)")).parse()
+        t0 = time.perf_counter()
+        result = ev.evaluate(ast, catalog)
+        elapsed = time.perf_counter() - t0
+        print(
+            f"{n:>8}  {elapsed:>14.4f}  {len(result.rows):>14}"
+        )
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Generate R(a,b) and S(b,c) relation files")
@@ -132,7 +175,16 @@ def main() -> None:
         default=Path("/tmp/bonus_join_exp"),
         help="directory for experiment data files",
     )
+    p.add_argument(
+        "--experiment-unary",
+        action="store_true",
+        help="measure select and project at each size using existing exp data",
+    )
     args = p.parse_args()
+
+    if args.experiment_unary:
+        run_unary_experiment(out_dir=args.exp_dir)
+        return
 
     if args.experiment:
         run_experiment(match=args.match, seed=args.seed, out_dir=args.exp_dir)
