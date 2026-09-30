@@ -23,3 +23,5 @@ Sept 24th - Evaluation seems to be working, all tests have passed, will double c
 Sept 26th - Added more tests, and added more error handling. Will continue to work on the project, and wrap up the report. added more tests, adjuted errors and updated tree display so it is more accurate
 
 sept 27-28th - Wrapped up the project, finsihed the report and finsiehd the grammer, will record tommarow and finish the project.
+
+Sept 29-30th - Finsihed video recording, updated error handling and reporting, finished readme and cleanup for the project.
