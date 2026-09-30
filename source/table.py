@@ -39,7 +39,7 @@ def load_relation(text: str) -> dict[str, Table]: #it acts lile Name(attributes)
 
     def expect(token_type, value=None):
         if not check(token_type, value):
-            raise ValueError(f"Expected {token_type} but got {peek().type}")
+            raise ValueError(f"Expected {token_type} but got {peek().type} at line {peek().line}, column {peek().column}")
         return next()
 
     def read_value():
@@ -51,7 +51,7 @@ def load_relation(text: str) -> dict[str, Table]: #it acts lile Name(attributes)
 
         if check(TokenType.IDENTIFIER):
             return next().value
-        raise ValueError(f"Expected a value but got {peek().type}")
+        raise ValueError(f"Expected a value but got {peek().type} at line {peek().line}, column {peek().column}")
 
     while not check(TokenType.EOF):
         name = expect(TokenType.IDENTIFIER).value
