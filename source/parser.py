@@ -180,7 +180,7 @@ class Parser:
 
 
 if __name__ == "__main__":
-    print(Parser(tokenise("select[Age>30](Employees)")).parse())
-    print(Parser(tokenise("project[Name](select[Age>30](Employees))")).parse())
-    q = "project[Name](select[Age>30](Employees))"
-    print(format_tree(Parser(tokenise(q)).parse()))
+    print(Parser(tokenise("select[Age>=30](Employees)")).parse())
+    # print(Parser(tokenise("project[Name](select[Age>30](Employees))")).parse())
+    q = "A times B"
+    print((Parser(tokenise(q)).parse()))

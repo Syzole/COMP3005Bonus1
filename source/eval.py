@@ -7,6 +7,7 @@ Pipeline: AST node -> recursively evaluate children -> return a Table.
 Handles select/project/rename, set ops, product, and join (with column qualification).
 """
 
+# thse counters are used to count the number of comparisons made during join and select operations
 join_comparisons = 0
 select_comparisons = 0
 
@@ -58,13 +59,20 @@ def normalize(v):
         return v[1:-1].replace("''", "'")
     return v
 
+def check_duplicate_attributes(attrs: list[str]):
+    seen = set()
+    for attr in attrs:
+        if attr in seen:
+            raise EvalError(f"schema, duplicate attribute {attr}")
+        seen.add(attr)
+
 def evaluate(node, catalog: dict[str, Table]) -> Table:
     global select_comparisons
     """Recursively evaluate AST; catalog maps relation name -> Table."""
     if isinstance(node, Relation):
         if node.name not in catalog:
             raise EvalError(f"name, unknown relation {node.name}")
-        return catalog[node.name]    
+        return catalog[node.name]
 
     if isinstance(node, Select):
         child = evaluate(node.input, catalog)
@@ -86,6 +94,8 @@ def evaluate(node, catalog: dict[str, Table]) -> Table:
         for attr in node.attrs:
             if attr not in child.attributes:
                 raise EvalError(f"name, unknown attribute {attr}")
+            if child.attributes.count(attr) > 1:
+                raise EvalError(f"schema, duplicate attribute {attr}")
 
         indexes = [child.attributes.index(a) for a in node.attrs]
         rows = []
@@ -106,10 +116,11 @@ def evaluate(node, catalog: dict[str, Table]) -> Table:
             left = qualify(left, relation_label(node.left))
             right = qualify(right, relation_label(node.right))
         return eval_binary(node.op, left, right, node.cond)
-        
+
     if isinstance(node, Rename):
         child = evaluate(node.input, catalog)
         attrs = [f"{node.name}.{a.split('.')[-1]}" for a in child.attributes]
+        check_duplicate_attributes(attrs)
         return Table(attributes=attrs, rows=list(child.rows))
 
     raise ValueError(f"not implemented: {type(node)}")
@@ -131,12 +142,14 @@ def eval_binary(op, left, right, cond):
 
     if op == "times":
         attrs = left.attributes + right.attributes
+        check_duplicate_attributes(attrs)
         rows = [l + r for l in left.rows for r in right.rows]
         return Table(attributes=attrs, rows=rows)
     if op == "join":
         if cond is None:
             raise EvalError("join requires a condition")
         attrs = left.attributes + right.attributes
+        check_duplicate_attributes(attrs)
         rows = []
         for l in left.rows:
             for r in right.rows:
@@ -145,9 +158,9 @@ def eval_binary(op, left, right, cond):
                 if matches(cond, attrs, row):
                     rows.append(row)
         return Table(attributes=attrs, rows=rows)
-    
+
     raise EvalError(f"not implemented: {op}")
-    
+
 
 
 def matches(cond, attrs: list[str], row: list) -> bool:
@@ -173,10 +186,13 @@ def value_of(operand, attrs, row):
         if len(s) >= 2 and s[0] == "'" and s[-1] == "'": #check if the string is wrapped in quotes
             s = s[1:-1].replace("''", "'") #replace double quotes with single quotes
         return s
-    if isinstance(operand, Attr): 
+    if isinstance(operand, Attr):
         key = f"{operand.relation}.{operand.name}" if operand.relation else operand.name # if the relation is not None, add the relation name to the attribute name
-        if key not in attrs:
+        count = attrs.count(key)
+        if count == 0:
             raise EvalError(f"name, unknown attribute {key}")
+        if count > 1:
+            raise EvalError(f"schema, ambiguous attribute {key}")
         return row[attrs.index(key)]
 
     raise ValueError(f"not implemented: {type(operand)}")

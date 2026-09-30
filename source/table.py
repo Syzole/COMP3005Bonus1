@@ -74,6 +74,24 @@ def load_relation(text: str) -> dict[str, Table]: #it acts lile Name(attributes)
             rows.append(row)
         
         expect(TokenType.RBRACE)
+
+        #this is a helper to check for duplicate attributes
+        seen_attrs = set()
+        for attr in attributes:
+            if attr in seen_attrs:
+                raise ValueError(f"schema, duplicate attribute {attr}")
+            seen_attrs.add(attr)
+        # drop duplicate rows
+        seen = set()
+        unique_rows = []
+        for row in rows:
+            key = tuple(row)
+            if key in seen:
+                continue
+            seen.add(key)
+            unique_rows.append(row)
+
+
         tables[name] = Table(attributes, rows)
     return tables
 

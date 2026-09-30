@@ -179,7 +179,7 @@ if __name__ == "__main__":
     from pathlib import Path
 
     tests = Path(__file__).resolve().parent.parent / "tests"
-    first, last = 19,19  # change this range as you go
+    first, last = 26,26 # change this range as you go
 
     for n in range(first, last + 1):
         query = (tests / str(n) / "query.txt").read_text(encoding="utf-8")
@@ -190,3 +190,4 @@ if __name__ == "__main__":
         except LexError as e:
             print(f"  ERROR: {e}")
         print()
+        

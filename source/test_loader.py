@@ -1,3 +1,5 @@
+#this file was used to test the loader and the tree formatter
+
 from dataclasses import dataclass
 from pathlib import Path
 from tokeniser import tokenise
@@ -31,7 +33,7 @@ def _read(path: Path) -> Source:
     return Source(path=str(path), text=text)
 
 
-TEST_NUMBER = 1,25
+TEST_NUMBER = 10,11
 
 for test_number in range(TEST_NUMBER[0], TEST_NUMBER[1] + 1):
     try:

@@ -1,6 +1,8 @@
 Langauge: Python
 Version: 3.13
 
+As a note, I thought that all the output tuples had to match the size of n or m so during the generation I made it so that synthenicly generated tuples would match the size of n and m. This is why the output tuples are equal to n or m in the tables below.
+
 | **n** | **m** | **comparisons** | **wall time (s)** | **output tuples** |
 |------:|------:|----------------:|------------------:|------------------:|
 | 1,000  | 1,000  | 1,000,000     | 0.6196    | 1,000  |
